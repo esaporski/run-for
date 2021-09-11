@@ -34,7 +34,7 @@ run()
     echoerr "$RUN_cmdname: Command \"${RUN_CLI[@]}\" exited at $(date)"
     RUN_stop_ts=$(date +%s)
 
-    RUN_elapsed_time=$(($RUN_stop_ts-$RUN_start_ts))
+    RUN_elapsed_time=$(($RUN_stop_ts - $RUN_start_ts))
     echoerr "$RUN_cmdname: \"${RUN_CLI[@]}\" took $RUN_elapsed_time second(s) to run"
 
     SECONDS_TO_WAIT=$(($RUN_TIME-$RUN_elapsed_time))
@@ -48,7 +48,7 @@ run()
 
     for second in `seq $SECONDS_TO_WAIT`
     do
-        echoerr "$RUN_cmdname: $(($SECONDS_TO_WAIT-$second)) second(s) to wait..."
+        echoerr "$RUN_cmdname: $(($SECONDS_TO_WAIT - $second + 1)) second(s) to wait..."
         sleep 1
     done
     return 0
