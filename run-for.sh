@@ -3,6 +3,7 @@
 # (Heavily inspired by wait-for-it.sh)
 
 RUN_cmdname=${0##*/}
+RUN_QUIET=0
 
 usage() {
 	cat <<USAGE >&2
@@ -15,7 +16,7 @@ USAGE
 	exit 1
 }
 
-echoerr() { if [[ $RUN_QUIET -ne 1 ]]; then echo "$@" 1>&2; fi; }
+echoerr() { if [ $RUN_QUIET -ne 1 ]; then echo "$@" 1>&2; fi; }
 
 run() {
 	echoerr "$RUN_cmdname: Starting command \"${RUN_CLI[*]}\" at $(date)"
@@ -24,7 +25,7 @@ run() {
 	"${RUN_CLI[@]}"
 	CLI_RETURN=$?
 
-	if [[ $CLI_RETURN -ne 0 ]]; then
+	if [ $CLI_RETURN -ne 0 ]; then
 		echoerr "$RUN_cmdname: Error executing command"
 		return $CLI_RETURN
 	fi
@@ -37,7 +38,7 @@ run() {
 
 	SECONDS_TO_WAIT=$((RUN_TIME - RUN_elapsed_time))
 
-	if [[ $SECONDS_TO_WAIT -lt 1 ]]; then
+	if [ $SECONDS_TO_WAIT -lt 1 ]; then
 		echoerr "$RUN_cmdname: Command took longer than $RUN_TIME second(s)"
 		return 0
 	fi
@@ -52,7 +53,7 @@ run() {
 }
 
 # Process arguments
-while [[ $# -gt 0 ]]; do
+while [ $# -gt 0 ]; do
 	case "$1" in
 	-q | --quiet)
 		RUN_QUIET=1
@@ -60,7 +61,7 @@ while [[ $# -gt 0 ]]; do
 		;;
 	-t)
 		RUN_TIME="$2"
-		if [[ $RUN_TIME == "" ]]; then break; fi
+		if [ "$RUN_TIME" = "" ]; then break; fi
 		shift 2
 		;;
 	--time=*)
@@ -84,7 +85,7 @@ done
 
 RUN_TIME=${RUN_TIME:-60}
 
-if [[ $RUN_TIME -lt 1 ]]; then
+if [ "$RUN_TIME" -lt 1 ]; then
 	echoerr "$RUN_cmdname: Script must run for at least 1 second"
 	exit 1
 fi
