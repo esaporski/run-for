@@ -18,10 +18,10 @@ USAGE
 echoerr() { if [[ $RUN_QUIET -ne 1 ]]; then echo "$@" 1>&2; fi; }
 
 run() {
-	echoerr "$RUN_cmdname: Starting command \"${RUN_CLI[@]}\" at $(date)"
+	echoerr "$RUN_cmdname: Starting command \"${RUN_CLI[*]}\" at $(date)"
 	RUN_start_ts=$(date +%s)
 
-	${RUN_CLI[@]}
+	"${RUN_CLI[@]}"
 	CLI_RETURN=$?
 
 	if [[ $CLI_RETURN -ne 0 ]]; then
@@ -29,13 +29,13 @@ run() {
 		return $CLI_RETURN
 	fi
 
-	echoerr "$RUN_cmdname: Command \"${RUN_CLI[@]}\" exited at $(date)"
+	echoerr "$RUN_cmdname: Command \"${RUN_CLI[*]}\" exited at $(date)"
 	RUN_stop_ts=$(date +%s)
 
-	RUN_elapsed_time=$(($RUN_stop_ts - $RUN_start_ts))
-	echoerr "$RUN_cmdname: \"${RUN_CLI[@]}\" took $RUN_elapsed_time second(s) to run"
+	RUN_elapsed_time=$((RUN_stop_ts - RUN_start_ts))
+	echoerr "$RUN_cmdname: \"${RUN_CLI[*]}\" took $RUN_elapsed_time second(s) to run"
 
-	SECONDS_TO_WAIT=$(($RUN_TIME - $RUN_elapsed_time))
+	SECONDS_TO_WAIT=$((RUN_TIME - RUN_elapsed_time))
 
 	if [[ $SECONDS_TO_WAIT -lt 1 ]]; then
 		echoerr "$RUN_cmdname: Command took longer than $RUN_TIME second(s)"
@@ -45,7 +45,7 @@ run() {
 	echoerr "$RUN_cmdname: Waiting $SECONDS_TO_WAIT second(s) before exiting"
 
 	for second in $(seq $SECONDS_TO_WAIT); do
-		echoerr "$RUN_cmdname: $(($SECONDS_TO_WAIT - $second + 1)) second(s) to wait..."
+		echoerr "$RUN_cmdname: $((SECONDS_TO_WAIT - second + 1)) second(s) to wait..."
 		sleep 1
 	done
 	return 0
@@ -89,7 +89,7 @@ if [[ $RUN_TIME -lt 1 ]]; then
 	exit 1
 fi
 
-if [[ $RUN_CLI != "" ]]; then
+if [ ${#RUN_CLI[@]} -ne 0 ]; then
 	run
 	RUN_RETURN=$?
 	exit $RUN_RETURN
