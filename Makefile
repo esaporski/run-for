@@ -22,7 +22,7 @@ build: gengetoptions build-cmd format ## Compile all scripts into one
 getoptions-cmd:
 	@echo "+$@"
 	@echo -e "\n+ Generating argument parser configuration..."
-	@gengetoptions embed --overwrite $(MAKEFILE_DIR)/src/parser.sh
+	@gengetoptions embed -w $(MAKEFILE_DIR)/src/parser.sh
 	@sed -i \
 		-e 's/echo "\$$1" >\&2/sixlogger fatal "\$$1"/g' \
 		-e '/^parse()/i # shellcheck disable=SC2004' $(MAKEFILE_DIR)/src/parser.sh

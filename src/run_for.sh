@@ -87,21 +87,9 @@ eval "set -- ${_rf_unknown_args}"
 _rf_unknown_args=$*
 
 if [ -n "$_rf_unknown_args" ]; then
-	sixlogger fatal "Unknown arguments: ${_rf_unknown_args}"
+	sixlogger fatal "Unknown arguments: '${_rf_unknown_args}'"
 	exit 3
 fi
-
-# Required parameters
-while read -r param; do
-	param_value=$(eval "printf '%s' \"\$${param}\"")
-	pretty_name=$(printf "%s" "${param#_rf_}" | tr "[:lower:]" "[:upper:]")
-	if _rf_is_string_empty "$param_value"; then
-		sixlogger fatal "Parameter cannot be empty: ${pretty_name}"
-		exit 4
-	fi
-done <<-EOF
-	_rf_command
-EOF
 
 run
 exit $?
