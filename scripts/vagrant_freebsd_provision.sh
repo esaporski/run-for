@@ -15,10 +15,13 @@ pkg install --yes \
 pkg install --yes \
 	git \
 	pcre2
-curl -fsSL https://git.io/shellspec | sh -s -- --yes --prefix /usr/local
+PREFIX="/usr/local"
+rm -f "${PREFIX}/bin/shellspec"
+rm -rf "${PREFIX}/lib/shellspec"
+curl -fsSL https://git.io/shellspec | sh -s -- --yes --prefix "$PREFIX"
 
 # Delete `.shrc` file (causes problems with some shells)
-rm /home/vagrant/.shrc
+rm -f /home/vagrant/.shrc
 
 # Enter `/mnt` directory when SSH session starts
-echo "cd /mnt" >>/home/vagrant/.profile
+grep -qxF 'cd /mnt' /home/vagrant/.profile || echo "cd /mnt" >>/home/vagrant/.profile

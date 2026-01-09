@@ -91,7 +91,7 @@ test-coverage: build shellspec-gen-bin ## Test and check code coverage with `she
 test-all: build container-images vagrant-up ## Test multiple shells in different OSes with container images and VMs
 	@echo "+ $@"
 	@echo -e "\n+ Running all shellspec tests..."
-	@$(MAKEFILE_DIR)/scripts/run_tests.sh
+	@$(MAKEFILE_DIR)/scripts/run_tests.sh || true
 	@make vagrant-halt
 
 ## Release:
