@@ -23,11 +23,19 @@ getoptions-cmd:
 	@echo "+$@"
 	@echo -e "\n+ Generating argument parser configuration..."
 	@gengetoptions embed -w $(MAKEFILE_DIR)/src/parser.sh
+
+# Use custom function for logging:
+# 	https://github.com/ko1nksm/getoptions/issues/64
+# 	https://github.com/ko1nksm/getoptions/pull/53
+# SC2004 (style): $/${} is unnecessary on arithmetic variables:
+# 	https://github.com/ko1nksm/getoptions/issues/66
+getoptions-sed:
 	@sed -i \
 		-e 's/echo "\$$1" >\&2/sixlogger fatal "\$$1"/g' \
-		-e '/^parse()/i # shellcheck disable=SC2004' $(MAKEFILE_DIR)/src/parser.sh
+		-e 's/\$$OPTIND - \$$#/OPTIND - \$$#/g' \
+		$(MAKEFILE_DIR)/src/parser.sh
 
-gengetoptions: getoptions-cmd format ## Generate argument parser configuration
+gengetoptions: getoptions-cmd format getoptions-sed ## Generate argument parser configuration
 
 container-images: ## Build container images for `shellspec`
 	@echo "+ $@"

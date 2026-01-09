@@ -72,7 +72,6 @@ _rf_command=''
 _rf_quiet='false'
 _rf_verbose='false'
 _rf_unknown_args=''
-# shellcheck disable=SC2004
 parse() {
 	OPTIND=$(($# + 1))
 	while OPTARG= && [ "${_rf_unknown_args}" != x ] && [ $# -gt 0 ]; do
@@ -140,7 +139,7 @@ parse() {
 		--)
 			shift
 			while [ $# -gt 0 ]; do
-				_rf_unknown_args="${_rf_unknown_args} \"\${$(($OPTIND - $#))}\""
+				_rf_unknown_args="${_rf_unknown_args} \"\${$((OPTIND - $#))}\""
 				shift
 			done
 			break
@@ -150,7 +149,7 @@ parse() {
 			break
 			;;
 		*)
-			_rf_unknown_args="${_rf_unknown_args} \"\${$(($OPTIND - $#))}\""
+			_rf_unknown_args="${_rf_unknown_args} \"\${$((OPTIND - $#))}\""
 			;;
 		esac
 		shift
