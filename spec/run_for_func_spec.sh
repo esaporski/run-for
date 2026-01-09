@@ -10,5 +10,3 @@
 
 # Unknown arguments
 #	_rf_unknown_args
-# Required parameters
-#	_rf_command

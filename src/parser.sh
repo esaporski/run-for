@@ -9,11 +9,11 @@ set -eu
 # shellcheck disable=SC2329
 parser_definition() {
 	setup _rf_unknown_args help:usage plus:false no:false error:_rf_error -- \
-		"Usage: run_for.sh {-c|--command <string>} [-s|--seconds <number>]" \
+		"Usage: run_for.sh -c|--command <string> [-s|--seconds <number>]" \
 		"		[-q|--quiet][-v|--verbose][-V|--version][-h|--help]" ''
 	msg -- 'Options:'
 	param _rf_seconds -s --seconds var:SECONDS init:=60 validate:_rf_validate_seconds -- "seconds to wait for script to exit [default: 60]"
-	param _rf_command -c --command var:COMMAND validate:_rf_is_string_empty mandatory:true -- "command to be executed {mandatory}"
+	param _rf_command -c --command var:COMMAND validate:_rf_is_string_empty mandatory:true -- "command to be executed"
 	flag _rf_quiet -q --quiet var:QUIET init:=false on:true no:false -- "don't output any status messages from 'run_for.sh' script"
 	flag _rf_verbose -v --verbose var:VERBOSE init:=false on:true no:false -- "increase verbosity"
 	disp VERSION -V --version -- "print the 'run_for.sh' script version"
@@ -39,9 +39,9 @@ parser_definition() {
 # Custom error handler
 _rf_error() {
 	case $2 in
-	_rf_validate_seconds:1) sixlogger fatal "Not a valid number: ${3} '${OPTARG}'" ;;
-	_rf_validate_seconds:2) sixlogger fatal "Script must run for at least 1 second" ;;
-	_rf_is_string_empty:1) sixlogger fatal "Argument '${3}' is empty: '${OPTARG}'" ;;
+	_rf_validate_seconds:1 | _rf_is_string_empty:1) sixlogger fatal "Argument '${3}' is empty: '${OPTARG}'" ;;
+	_rf_validate_seconds:2) sixlogger fatal "Not a valid number: ${3} '${OPTARG}'" ;;
+	_rf_validate_seconds:3) sixlogger fatal "Script must run for at least 1 second" ;;
 	*) return 0 ;; # Display default error
 	esac
 	return 1
@@ -52,9 +52,9 @@ _rf_validate_seconds() {
 	# Cannot be empty string
 	_rf_is_string_empty || return 1
 	# Has to be a number
-	case $OPTARG in *[!0-9]*) return 1 ;; esac
+	case $OPTARG in *[!0-9]*) return 2 ;; esac
 	# Has to be >= 1
-	[ "$OPTARG" -ge 1 ] || return 2
+	[ "$OPTARG" -ge 1 ] || return 3
 }
 
 _rf_is_string_empty() {
@@ -169,7 +169,7 @@ parse() {
 	pattern:*) set "Does not match the pattern (${1#*:}): $2" "$@" ;;
 	notcmd) set "Not a command: $2" "$@" ;;
 	*)
-		{ [ -z "${1:-}" ] && [ -z "${_c_flag_declared:-}" ] && set "Mandatory argument: -c" "mandatory -c"; } ||
+		{ [ -z "${1:-}" ] && [ -z "${_c_flag_declared:-}" ] && set "Mandatory argument: -c" "mandatory" "-c"; } ||
 			set "Validation error ($1): $2" "$@"
 		;;
 	esac
@@ -179,12 +179,12 @@ parse() {
 }
 usage() {
 	cat <<'GETOPTIONSHERE'
-Usage: run_for.sh {-c|--command <string>} [-s|--seconds <number>]
+Usage: run_for.sh -c|--command <string> [-s|--seconds <number>]
     [-q|--quiet][-v|--verbose][-V|--version][-h|--help]
 
 Options:
   -s,     --seconds SECONDS   seconds to wait for script to exit [default: 60]
-  -c,     --command COMMAND   command to be executed {mandatory}
+  -c,     --command COMMAND   command to be executed
   -q,     --quiet             don't output any status messages from 'run_for.sh' script
   -v,     --verbose           increase verbosity
   -V,     --version           print the 'run_for.sh' script version
